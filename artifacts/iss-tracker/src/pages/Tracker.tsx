@@ -15,7 +15,11 @@ import type { ISSPosition, LocationRecord } from "@/lib/issApi";
 
 const REFRESH_INTERVAL = 10000;
 
-export default function Tracker() {
+interface TrackerProps {
+  onReplayIntro: () => void;
+}
+
+export default function Tracker({ onReplayIntro }: TrackerProps) {
   const [position, setPosition] = useState<ISSPosition | null>(null);
   const [location, setLocation] = useState({ country: '...', region: '...' });
   const [history, setHistory] = useState<LocationRecord[]>(() => loadHistory());
@@ -97,7 +101,7 @@ export default function Tracker() {
               <p className="text-[10px] text-gray-600 font-mono-iss">محطة الفضاء الدولية</p>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 pulse-dot" />
               <span className="font-mono-iss text-[10px] text-green-400">LIVE</span>
@@ -107,6 +111,19 @@ export default function Tracker() {
                 {lastUpdate.toLocaleTimeString('ar-EG')}
               </span>
             )}
+            <button
+              data-testid="button-replay-intro"
+              onClick={onReplayIntro}
+              className="font-orbitron text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,200,255,0.15), rgba(155,89,182,0.15))',
+                border: '1px solid rgba(0,200,255,0.3)',
+                color: '#00c8ff',
+              }}
+              title="إعادة المقدمة"
+            >
+              ▶ المقدمة
+            </button>
           </div>
         </div>
       </header>

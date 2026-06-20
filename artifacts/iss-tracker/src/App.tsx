@@ -21,20 +21,20 @@ function AppContent() {
     });
   }, []);
 
-  const handleIntroComplete = () => setShowIntro(false);
-
   return (
     <>
       {showIntro && (
         <IntroAnimation
-          onComplete={handleIntroComplete}
+          onComplete={() => setShowIntro(false)}
           issLat={initialPos?.latitude ?? 0}
           issLon={initialPos?.longitude ?? 0}
         />
       )}
       <div style={{ visibility: showIntro ? 'hidden' : 'visible' }}>
         <Switch>
-          <Route path="/" component={Tracker} />
+          <Route path="/">
+            {() => <Tracker onReplayIntro={() => setShowIntro(true)} />}
+          </Route>
           <Route component={NotFound} />
         </Switch>
       </div>
