@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ISS Tracker — محطة الفضاء الدولية"
+version = "1.0.0"
+id = "artifacts/iss-tracker"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19075
+
+[services.development]
+run = "pnpm --filter @workspace/iss-tracker run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/iss-tracker", "run", "build" ]
+publicDir = "artifacts/iss-tracker/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19075"
+BASE_PATH = "/"
