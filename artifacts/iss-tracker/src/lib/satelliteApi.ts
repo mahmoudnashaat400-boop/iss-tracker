@@ -36,18 +36,14 @@ export interface TLEData {
 }
 
 export async function fetchTLE(noradId: string): Promise<TLEData> {
-  // Try Celestrak first
-  const url = `https://corsproxy.io/?url=https://celestrak.org/NORAD/elements/gp.php?CATNR=${noradId}&FORMAT=TLE`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const text = await res.text();
-  const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
-  if (lines.length < 3) throw new Error('Invalid TLE response');
-  return {
-    name: lines[0].replace(/^0 /, '').trim(),
-    line1: lines[1],
-    line2: lines[2],
-  };
+  const res = await fetch(`/api/tle/${noradId}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` })) as { error?: string };
+    throw new Error(err.error ?? `HTTP ${res.status}`);
+  }
+  const data = await res.json() as { name: string; line1: string; line2: string };
+  if (!data.line1 || !data.line2) throw new Error('Invalid TLE response');
+  return data;
 }
 
 export function computePosition(tle: TLEData, date: Date = new Date()): SatellitePosition | null {
