@@ -131,19 +131,56 @@ export default function Tracker({ onReplayIntro }: TrackerProps) {
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Hero stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: 'الدولة / المنطقة', value: location.country, sub: location.region, icon: '🌍', color: '#00c8ff', testId: 'text-country' },
-            { label: 'الارتفاع', value: loading ? '...' : `${position?.altitude.toFixed(1)} km`, sub: 'فوق سطح الأرض', icon: '↑', color: '#9b59b6', testId: 'text-altitude' },
-            { label: 'السرعة', value: loading ? '...' : `${position?.velocity.toFixed(0)} km/h`, sub: `${((position?.velocity ?? 0) / 3600).toFixed(2)} km/s`, icon: '⚡', color: '#f39c12', testId: 'text-velocity' },
-            { label: 'الإحداثيات', value: loading ? '...' : `${issLat.toFixed(3)}°`, sub: `${issLon.toFixed(3)}°`, icon: '📍', color: '#2ecc71', testId: 'text-coords' },
-          ].map((stat) => (
-            <div key={stat.label} data-testid={stat.testId} className="card-space rounded-2xl p-4 relative overflow-hidden">
-              <div className="absolute top-3 right-3 text-xl opacity-30">{stat.icon}</div>
-              <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">{stat.label}</p>
-              <p className="font-orbitron font-black text-base md:text-lg leading-tight data-ticker" style={{ color: stat.color }}>{stat.value}</p>
-              <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5 truncate">{stat.sub}</p>
-            </div>
-          ))}
+          {/* Country */}
+          <div data-testid="text-country" className="card-space rounded-2xl p-4 relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-xl opacity-30">🌍</div>
+            <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">الدولة / المنطقة</p>
+            <p className="font-orbitron font-black text-base md:text-lg leading-tight data-ticker" style={{ color: '#00c8ff' }}>{location.country}</p>
+            <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5 truncate">{location.region}</p>
+          </div>
+          {/* Altitude */}
+          <div data-testid="text-altitude" className="card-space rounded-2xl p-4 relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-xl opacity-30">↑</div>
+            <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">الارتفاع</p>
+            <p className="font-orbitron font-black text-base md:text-lg leading-tight data-ticker" style={{ color: '#9b59b6' }}>{loading ? '...' : `${position?.altitude.toFixed(1)} km`}</p>
+            <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5">فوق سطح الأرض</p>
+          </div>
+          {/* Speed */}
+          <div data-testid="text-velocity" className="card-space rounded-2xl p-4 relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-xl opacity-30">⚡</div>
+            <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">السرعة</p>
+            <p className="font-orbitron font-black text-base md:text-lg leading-tight data-ticker" style={{ color: '#f39c12' }}>{loading ? '...' : `${position?.velocity.toFixed(0)} km/h`}</p>
+            <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5">{loading ? '' : `${((position?.velocity ?? 0) / 3600).toFixed(2)} km/s`}</p>
+          </div>
+          {/* Coordinates — both LAT + LON */}
+          <div data-testid="text-coords" className="card-space rounded-2xl p-4 relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-xl opacity-30">📍</div>
+            <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-2">الإحداثيات</p>
+            {loading ? (
+              <p className="font-orbitron font-black text-base" style={{ color: '#2ecc71' }}>...</p>
+            ) : (
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono-iss text-[9px] text-gray-500 w-5">LAT</span>
+                  <span className="font-orbitron font-black text-sm data-ticker" style={{ color: '#2ecc71' }}>
+                    {Math.abs(issLat).toFixed(4)}°
+                  </span>
+                  <span className="font-orbitron text-[10px] font-bold px-1 rounded" style={{ color: issLat >= 0 ? '#2ecc71' : '#e74c3c', background: issLat >= 0 ? 'rgba(46,204,113,0.12)' : 'rgba(231,76,60,0.12)' }}>
+                    {issLat >= 0 ? 'N' : 'S'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono-iss text-[9px] text-gray-500 w-5">LON</span>
+                  <span className="font-orbitron font-black text-sm data-ticker" style={{ color: '#1abc9c' }}>
+                    {Math.abs(issLon).toFixed(4)}°
+                  </span>
+                  <span className="font-orbitron text-[10px] font-bold px-1 rounded" style={{ color: issLon >= 0 ? '#1abc9c' : '#9b59b6', background: issLon >= 0 ? 'rgba(26,188,156,0.12)' : 'rgba(155,89,182,0.12)' }}>
+                    {issLon >= 0 ? 'E' : 'W'}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Main content */}

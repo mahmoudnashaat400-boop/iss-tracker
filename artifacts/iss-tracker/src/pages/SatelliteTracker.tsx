@@ -267,18 +267,53 @@ export default function SatelliteTracker({ onReplayIntro }: SatelliteTrackerProp
 
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { label: 'الدولة / المنطقة', value: country, icon: '🌍', color: '#9b59b6' },
-                { label: 'الارتفاع', value: `${position.altitude.toFixed(1)} km`, icon: '↑', color: '#00c8ff' },
-                { label: 'السرعة', value: `${position.velocity.toFixed(0)} km/h`, icon: '⚡', color: '#f39c12' },
-                { label: 'الإحداثيات', value: `${position.lat.toFixed(3)}°`, icon: '📍', color: '#2ecc71' },
-              ].map(s => (
-                <div key={s.label} className="card-space rounded-2xl p-4 relative overflow-hidden">
-                  <div className="absolute top-3 right-3 text-xl opacity-30">{s.icon}</div>
-                  <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">{s.label}</p>
-                  <p className="font-orbitron font-black text-base data-ticker" style={{ color: s.color }}>{s.value}</p>
+              {/* Country */}
+              <div className="card-space rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-3 right-3 text-xl opacity-30">🌍</div>
+                <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">الدولة / المنطقة</p>
+                <p className="font-orbitron font-black text-base data-ticker" style={{ color: '#9b59b6' }}>{country}</p>
+              </div>
+              {/* Altitude */}
+              <div className="card-space rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-3 right-3 text-xl opacity-30">↑</div>
+                <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">الارتفاع</p>
+                <p className="font-orbitron font-black text-base data-ticker" style={{ color: '#00c8ff' }}>{position.altitude.toFixed(1)} km</p>
+                <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5">فوق سطح الأرض</p>
+              </div>
+              {/* Speed */}
+              <div className="card-space rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-3 right-3 text-xl opacity-30">⚡</div>
+                <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-1">السرعة</p>
+                <p className="font-orbitron font-black text-base data-ticker" style={{ color: '#f39c12' }}>{position.velocity.toFixed(0)} km/h</p>
+                <p className="text-gray-600 text-[10px] font-mono-iss mt-0.5">{(position.velocity / 3600).toFixed(3)} km/s</p>
+              </div>
+              {/* Coordinates — both LAT + LON */}
+              <div className="card-space rounded-2xl p-4 relative overflow-hidden">
+                <div className="absolute top-3 right-3 text-xl opacity-30">📍</div>
+                <p className="text-gray-500 text-[10px] font-mono-iss tracking-widest uppercase mb-2">الإحداثيات</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono-iss text-[9px] text-gray-500 w-5">LAT</span>
+                    <span className="font-orbitron font-black text-sm data-ticker" style={{ color: '#2ecc71' }}>
+                      {Math.abs(position.lat).toFixed(4)}°
+                    </span>
+                    <span className="font-orbitron text-[10px] font-bold px-1 rounded"
+                      style={{ color: position.lat >= 0 ? '#2ecc71' : '#e74c3c', background: position.lat >= 0 ? 'rgba(46,204,113,0.12)' : 'rgba(231,76,60,0.12)' }}>
+                      {position.lat >= 0 ? 'N' : 'S'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono-iss text-[9px] text-gray-500 w-5">LON</span>
+                    <span className="font-orbitron font-black text-sm data-ticker" style={{ color: '#1abc9c' }}>
+                      {Math.abs(position.lon).toFixed(4)}°
+                    </span>
+                    <span className="font-orbitron text-[10px] font-bold px-1 rounded"
+                      style={{ color: position.lon >= 0 ? '#1abc9c' : '#c084fc', background: position.lon >= 0 ? 'rgba(26,188,156,0.12)' : 'rgba(192,132,252,0.12)' }}>
+                      {position.lon >= 0 ? 'E' : 'W'}
+                    </span>
+                  </div>
                 </div>
-              ))}
+              </div>
             </div>
 
             {/* Tabs + content */}
