@@ -5,6 +5,7 @@ import AstronautsPanel from "@/components/AstronautsPanel";
 import HistoryLog from "@/components/HistoryLog";
 import PassoverTimer from "@/components/PassoverTimer";
 import SixGPanel from "@/components/SixGPanel";
+import StarLinkPanel from "@/components/StarLinkPanel";
 import {
   fetchISSPosition,
   reverseGeocode,
@@ -265,6 +266,7 @@ export default function Tracker({ onReplayIntro }: TrackerProps) {
           {/* Right: Info panels */}
           <div className="space-y-4">
             <AstronautsPanel />
+            <StarLinkPanel userLat={userLat} userLon={userLon} />
             <PassoverTimer issLat={issLat} issLon={issLon} />
           </div>
         </div>
