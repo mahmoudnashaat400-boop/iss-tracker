@@ -18,19 +18,17 @@ export default defineConfig({
     },
     dedupe: ["react", "react-dom"],
   },
+  optimizeDeps: {
+    exclude: ["satellite.js"],
+  },
   root: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     target: "esnext",
     rollupOptions: {
-      output: {
-        format: "es",
-      },
+      external: (id) => id.includes("wasm-build"),
     },
-  },
-  optimizeDeps: {
-    exclude: ["satellite.js"],
   },
   server: {
     port: 3000,
