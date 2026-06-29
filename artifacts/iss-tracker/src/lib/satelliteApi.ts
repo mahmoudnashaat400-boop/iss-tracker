@@ -36,14 +36,41 @@ export interface TLEData {
 }
 
 export async function fetchTLE(noradId: string): Promise<TLEData> {
-  const res = await fetch(`/api/tle/${noradId}`);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` })) as { error?: string };
-    throw new Error(err.error ?? `HTTP ${res.status}`);
+  // Try ivanstanojevic first (CORS-friendly public API)
+  try {
+    const res = await fetch(`https://tle.ivanstanojevic.me/api/tle/${noradId}`, {
+      signal: AbortSignal.timeout(8000),
+    });
+    if (res.ok) {
+      const data = await res.json() as { name?: string; line1?: string; line2?: string };
+      if (data.line1 && data.line2) {
+        return { name: data.name ?? `SAT-${noradId}`, line1: data.line1, line2: data.line2 };
+      }
+    }
+  } catch {
+    // fall through to next source
   }
-  const data = await res.json() as { name: string; line1: string; line2: string };
-  if (!data.line1 || !data.line2) throw new Error('Invalid TLE response');
-  return data;
+
+  // Fallback: celestrak via cors proxy
+  try {
+    const url = `https://corsproxy.io/?url=https://celestrak.org/NORAD/elements/gp.php?CATNR=${noradId}&FORMAT=TLE`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      const text = await res.text();
+      const lines = text.trim().split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length >= 3) {
+        return {
+          name: lines[0].replace(/^0 /, '').trim(),
+          line1: lines[1],
+          line2: lines[2],
+        };
+      }
+    }
+  } catch {
+    // fall through
+  }
+
+  throw new Error(`Failed to fetch TLE for NORAD ID ${noradId}`);
 }
 
 export function computePosition(tle: TLEData, date: Date = new Date()): SatellitePosition | null {
@@ -61,7 +88,6 @@ export function computePosition(tle: TLEData, date: Date = new Date()): Satellit
     const lon = satellite.degreesLong(geodetic.longitude);
     const altitude = geodetic.height; // km
 
-    // velocity from velocity vector
     const vel = posVel.velocity as { x: number; y: number; z: number } | false;
     const speed = vel
       ? Math.sqrt(vel.x ** 2 + vel.y ** 2 + vel.z ** 2) * 3600 // km/h
@@ -80,7 +106,6 @@ export function computePosition(tle: TLEData, date: Date = new Date()): Satellit
 }
 
 export function getOrbitalPeriod(tle: TLEData): number {
-  // Mean motion is in line 2, field revolutions/day
   try {
     const line2 = tle.line2;
     const meanMotion = parseFloat(line2.substring(52, 63)); // rev/day
